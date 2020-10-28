@@ -192,7 +192,7 @@ $ git push
 
 Sometimes GitHub says we can't merge a pull request because we have merge conflicts.
 This happens when a teammate worked on the same lines in a different branch.
-Git doesn't know which version of the new lines to take - ours or our teammate's, so it asks us to decide.
+A merge conflict is a place where we need to update our change to account for changes already made by a teammate.
 
 First, we need to pull the latest changes from GitHub's `master` branch label to our laptop.
 
@@ -201,9 +201,78 @@ First, we need to pull the latest changes from GitHub's `master` branch label to
 $ git switch master
 # Retrieve the new commits from GitHub.
 $ git pull
+# Switch back to our feature branch.
+$ git switch my-new-branch
+# Re-play all of the commits in our branch on top of newer changes in master.
+$ git rebase master
 ```
 
-_TODO: Finish this section._
+At some point during the `rebase`, Git will stop because it came to a commit that changed lines that have more recent updates in `master`.
+This could be simple if a teammate renamed a variable and our commit still uses its old name.
+Perhaps a teammate refactored a method, and our commit wants to change code that's now in a different place.
+
+```sh
+# Show which files we need to update.
+$ git status
+Unmerged paths:
+  (use "git restore --staged <file>..." to unstage)
+  (use "git add <file>..." to mark resolution)
+	both modified:   hello-world.js
+```
+
+For a contrived example, let's say we have a `sayHello()` function.
+A teammate just merged a pull request to `master` that added a `name` parameter to say "Hello" to people by name.
+But in our feature branch, we updated it to say "Greetings" instead.
+
+```js
+<<<<<< Changes from teammate's commit "Say hello by name" in master
+function sayHello(name) {
+	console.log(`Hello, ${name}!`);
+======
+function sayHello() {
+	console.log('Greetings, world!');
+>>>>>> Changes from our commit "Greet the world instead" in my-new-branch
+}
+
+sayHello('Brandon');
+```
+
+If we take just their change, <code>console.log(&#96;Hello, ${name}!&#96;);</code> would lose our "Greetings" change.
+If we take just our change, `console.log("Greetings, world!");` would undo their already-merged change.
+We need to manually combine the changes into <code>console.log(&#96;Greetings, ${name}!&#96;);</code> to include both updates.
+
+```sh
+# Now that we've resolved the merge conflict, add the file to the commit staging area.
+$ git add hello-world.js
+# Optionally take a look at our updated changes.
+$ git diff --staged
+# And continue with the rebase.
+$ git rebase --continue
+```
+
+Now we need to send the updated commits and branch label to GitHub.
+If we were to run `git push` right now, Git would reject the push.
+Instead of adding new commits to the branch on GitHub, we want to _replace_ the existing commits with our updated commits.
+For this, we use `git push --force-with-lease`.
+Git will replace the commits, but it will also protect us from overwriting any new commits on the branch.
+
+<img src="rebase-master.png" width="1024" />
+
+If we've added commits from review suggestions on GitHub but forgot to pull them down before rebasing, Git will reject the push even with `--force-with-lease` because the push would overwrite the suggestion commits.
+We need to start over and pull the suggestion commits before performing the rebase.
+
+```sh
+# Switch to our feature branch.
+$ git switch my-new-branch
+# Start over back where the pull request is.
+$ git reset --hard origin/my-new-branch
+# Pull any new commits from the pull request.
+$ git pull
+# Now re-do the rebase on master.
+$ git rebase master
+# After resolving merge conflicts and finishing the rebase, update the pull request.
+$ git push --force-with-lease
+```
 
 ## Git etiquette
 
