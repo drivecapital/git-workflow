@@ -1,5 +1,28 @@
 # Git
 
+## Contents
+
+1. [Core Concepts]
+    1. [Commits]
+    1. [`HEAD`]
+    1. [Branches]
+    1. [Pushing and pulling]
+1. [Working on code]
+    1. [Starting a feature or bug fix]
+    1. [Committing changes]
+    1. [Opening a pull request]
+        1. [Review feedback]
+        1. [Suggested changes]
+        1. [Rejected push]
+    1. [Merge conflicts]
+1. [Git etiquette]
+1. [Advanced usage]
+    1. [Reverting a pull request]
+    1. [Committing only part of a file]
+    1. [Un-staging changes]
+    1. [Interactive rebase]
+1. [Configuration]
+
 This guide assumes Git version 2.28.0.
 You can install it from [Homebrew](https://brew.sh/) with `brew install git`.
 The version of Git that comes with macOS is older, so if some of these commands don't work, check `git --version`.
@@ -280,3 +303,24 @@ Enable branch protection in your GitHub repository's settings:
         - If your automated tests aren't flaky.
     - Optionally, require linear history
         - Forces people to resolve conflicts via rebasing their feature branch on `master` instead of merge commits.
+
+[Advanced usage]: #advanced-usage
+[Branches]: #branches
+[Commits]: #commits
+[Committing changes]: #committing-changes
+[Committing only part of a file]: #committing-only-part-of-a-file
+[Configuration]: #configuration
+[Core Concepts]: #core-concepts
+[`HEAD`]: #head
+[Git etiquette]: #git-etiquette
+[Interactive rebase]: #interactive-rebase
+[Merge conflicts]: #merge-conflicts
+[Opening a pull request]: #opening-a-pull-request
+[Pushing and pulling]: #pushing-and-pulling
+[Rejected push]: #rejected-push
+[Reverting a pull request]: #reverting-a-pull-request
+[Review feedback]: #review-feedback
+[Starting a feature or bug fix]: #starting-a-feature-or-bug-fix
+[Suggested changes]: #suggested-changes
+[Un-staging changes]: #un-staging-changes
+[Working on code]: #working-on-code
