@@ -464,6 +464,8 @@ Enable [branch protection](https://docs.github.com/en/free-pro-team@latest/githu
     - Optionally, require linear history
         - Forces people to resolve conflicts via rebasing their feature branch on `master` instead of merge commits.
 
+GitHub will automatically clean up branches after merging pull requests if you enable "[Automatically delete head branches](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-the-automatic-deletion-of-branches)".
+
 [Advanced usage]: #advanced-usage
 [Branches]: #branches
 [Cherry-picking commits]: #cherry-picking-commits
