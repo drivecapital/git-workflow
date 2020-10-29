@@ -380,8 +380,8 @@ Enable branch protection in your GitHub repository's settings:
 [Committing only part of a file]: #committing-only-part-of-a-file
 [Configuration]: #configuration
 [Core Concepts]: #core-concepts
-[`HEAD`]: #head
 [Git etiquette]: #git-etiquette
+[`HEAD`]: #head
 [Interactive rebase]: #interactive-rebase
 [Merge conflicts]: #merge-conflicts
 [Opening a pull request]: #opening-a-pull-request
