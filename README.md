@@ -446,7 +446,7 @@ When "fast forwarding", if your local branch contains commits A, B, C, and GitHu
 $ git config --global pull.ff only
 ```
 
-Enable branch protection in your GitHub repository's settings:
+Enable [branch protection](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-protected-branches) in your GitHub repository's settings:
 
 - `master`
     - Don't allow force pushes
@@ -463,6 +463,8 @@ Enable branch protection in your GitHub repository's settings:
         - If your automated tests aren't flaky.
     - Optionally, require linear history
         - Forces people to resolve conflicts via rebasing their feature branch on `master` instead of merge commits.
+
+GitHub will automatically clean up branches after merging pull requests if you enable "[Automatically delete head branches](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-the-automatic-deletion-of-branches)".
 
 [Advanced usage]: #advanced-usage
 [Branches]: #branches
