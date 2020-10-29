@@ -446,7 +446,7 @@ When "fast forwarding", if your local branch contains commits A, B, C, and GitHu
 $ git config --global pull.ff only
 ```
 
-Enable branch protection in your GitHub repository's settings:
+Enable [branch protection](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-protected-branches) in your GitHub repository's settings:
 
 - `master`
     - Don't allow force pushes
