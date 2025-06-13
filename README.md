@@ -2,32 +2,34 @@
 
 ## Contents
 
-1. [Core Concepts]
-    1. [Commits]
-    1. [`HEAD`]
-    1. [Branches]
-    1. [Pushing and pulling]
-1. [Working on code]
-    1. [Starting a feature or bug fix]
-    1. [Committing changes]
-    1. [Opening a pull request]
-        1. [Review feedback]
-        1. [Suggested changes]
-        1. [Rejected push]
-    1. [Merge conflicts]
-1. [Git etiquette]
-    1. [One focus per pull request]
-    1. [Tell a linear story]
-1. [Advanced usage]
-    1. [Reverting a pull request]
-    1. [Committing only part of a file]
-    1. [Un-staging changes]
-    1. [Cherry-picking commits]
-    1. [Interactive rebase]
-        1. [Re-ordering commits]
-        1. [Fixing prior commits]
-        1. [Splitting up commits]
-1. [Configuration]
+- [Git](#git)
+  - [Contents](#contents)
+  - [Core Concepts](#core-concepts)
+    - [Commits](#commits)
+    - [`HEAD`](#head)
+    - [Branches](#branches)
+    - [Pushing and pulling](#pushing-and-pulling)
+  - [Working on code](#working-on-code)
+    - [Starting a feature or bug fix](#starting-a-feature-or-bug-fix)
+    - [Committing changes](#committing-changes)
+    - [Opening a pull request](#opening-a-pull-request)
+      - [Review feedback](#review-feedback)
+      - [Suggested changes](#suggested-changes)
+      - [Rejected push](#rejected-push)
+    - [Merge conflicts](#merge-conflicts)
+  - [Git etiquette](#git-etiquette)
+    - [One focus per pull request](#one-focus-per-pull-request)
+    - [Tell a linear story](#tell-a-linear-story)
+  - [Advanced usage](#advanced-usage)
+    - [Reverting a pull request](#reverting-a-pull-request)
+    - [Committing only part of a file](#committing-only-part-of-a-file)
+    - [Un-staging changes](#un-staging-changes)
+    - [Cherry-picking commits](#cherry-picking-commits)
+    - [Interactive rebase](#interactive-rebase)
+      - [Re-ordering commits](#re-ordering-commits)
+      - [Fixing prior commits](#fixing-prior-commits)
+      - [Splitting up commits](#splitting-up-commits)
+  - [Configuration](#configuration)
 
 This guide assumes Git version 2.28.0.
 You can install it from [Homebrew](https://brew.sh/) with `brew install git`.
