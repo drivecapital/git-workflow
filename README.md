@@ -2,32 +2,34 @@
 
 ## Contents
 
-1. [Core Concepts]
-    1. [Commits]
-    1. [`HEAD`]
-    1. [Branches]
-    1. [Pushing and pulling]
-1. [Working on code]
-    1. [Starting a feature or bug fix]
-    1. [Committing changes]
-    1. [Opening a pull request]
-        1. [Review feedback]
-        1. [Suggested changes]
-        1. [Rejected push]
-    1. [Merge conflicts]
-1. [Git etiquette]
-    1. [One focus per pull request]
-    1. [Tell a linear story]
-1. [Advanced usage]
-    1. [Reverting a pull request]
-    1. [Committing only part of a file]
-    1. [Un-staging changes]
-    1. [Cherry-picking commits]
-    1. [Interactive rebase]
-        1. [Re-ordering commits]
-        1. [Fixing prior commits]
-        1. [Splitting up commits]
-1. [Configuration]
+- [Git](#git)
+  - [Contents](#contents)
+  - [Core Concepts](#core-concepts)
+    - [Commits](#commits)
+    - [`HEAD`](#head)
+    - [Branches](#branches)
+    - [Pushing and pulling](#pushing-and-pulling)
+  - [Working on code](#working-on-code)
+    - [Starting a feature or bug fix](#starting-a-feature-or-bug-fix)
+    - [Committing changes](#committing-changes)
+    - [Opening a pull request](#opening-a-pull-request)
+      - [Review feedback](#review-feedback)
+      - [Suggested changes](#suggested-changes)
+      - [Rejected push](#rejected-push)
+    - [Merge conflicts](#merge-conflicts)
+  - [Git etiquette](#git-etiquette)
+    - [One focus per pull request](#one-focus-per-pull-request)
+    - [Tell a linear story](#tell-a-linear-story)
+  - [Advanced usage](#advanced-usage)
+    - [Reverting a pull request](#reverting-a-pull-request)
+    - [Committing only part of a file](#committing-only-part-of-a-file)
+    - [Un-staging changes](#un-staging-changes)
+    - [Cherry-picking commits](#cherry-picking-commits)
+    - [Interactive rebase](#interactive-rebase)
+      - [Re-ordering commits](#re-ordering-commits)
+      - [Fixing prior commits](#fixing-prior-commits)
+      - [Splitting up commits](#splitting-up-commits)
+  - [Configuration](#configuration)
 
 This guide assumes Git version 2.28.0.
 You can install it from [Homebrew](https://brew.sh/) with `brew install git`.
@@ -62,10 +64,10 @@ When we create a new commit, the previous `HEAD` commit is the new commit's pare
 ### Branches
 
 Branches are special labels that point to commits.
-`master` is a regular branch whose label is "master".
-Sometimes repositories choose to call it `main` instead.
-Because we start work by branching from `master`, our branches look like a tree with `master` as the trunk.
-We can follow commits' parents in a chain and eventually end up back in the `master` trunk.
+`main` is a regular branch whose label is "main".
+Sometimes repositories choose to call it `master` instead.
+Because we start work by branching from `main`, our branches look like a tree with `main` as the trunk.
+We can follow commits' parents in a chain and eventually end up back in the `main` trunk.
 
 <img src="branches.png" width="620" />
 
@@ -94,20 +96,20 @@ When we pull a branch from GitHub, Git retrieves all the commits that are in Git
 
 ## Working on code
 
-The `master` branch should be the authoritative source for what exists in production.
-Changes should only reach `master` when the tests are passing and they're ready for production.
+The `main` branch should be the authoritative source for what exists in production.
+Changes should only reach `main` when the tests are passing and they're ready for production.
 
 ### Starting a feature or bug fix
 
-We work on in-progress changes in "feature branches" off of `master`.
+We work on in-progress changes in "feature branches" off of `main`.
 We feature branch might implement a new feature, add a test, change some copy, or fix a bug.
 
 ```sh
-# Make sure we're starting our branch off of master.
-$ git switch master
-# And make sure we have the latest changes from master on GitHub.
+# Make sure we're starting our branch off of main.
+$ git switch main
+# And make sure we have the latest changes from main on GitHub.
 $ git pull
-# Create the feature branch from master. Name it something descriptive, like
+# Create the feature branch from main. Name it something descriptive, like
 # `very-cool-feature` or `fix-issue-123`.
 $ git branch new-branch-name
 # Switch to the new branch.
@@ -115,8 +117,8 @@ $ git switch new-branch-name
 ```
 
 At this point, we're working on the `new-branch-name` branch.
-For now, `HEAD`, `new-branch-name`, and `master` all point to the same most recent commit.
-Any new commits will be added to `new-branch-name` but not `master`.
+For now, `HEAD`, `new-branch-name`, and `main` all point to the same most recent commit.
+Any new commits will be added to `new-branch-name` but not `main`.
 
 ### Committing changes
 
@@ -223,20 +225,20 @@ Sometimes GitHub says we can't merge a pull request because we have merge confli
 This happens when a teammate worked on the same lines in a different branch.
 A merge conflict is a place where we need to update our change to account for changes already made by a teammate.
 
-First, we need to pull the latest changes from GitHub's `master` branch label to our laptop.
+First, we need to pull the latest changes from GitHub's `main` branch label to our laptop.
 
 ```sh
-# Switch to our local master branch.
-$ git switch master
+# Switch to our local main branch.
+$ git switch main
 # Retrieve the new commits from GitHub.
 $ git pull
 # Switch back to our feature branch.
 $ git switch my-new-branch
-# Re-play all of the commits in our branch on top of newer changes in master.
-$ git rebase master
+# Re-play all of the commits in our branch on top of newer changes in main.
+$ git rebase main
 ```
 
-At some point during the `rebase`, Git will stop because it came to a commit that changed lines that have more recent updates in `master`.
+At some point during the `rebase`, Git will stop because it came to a commit that changed lines that have more recent updates in `main`.
 This could be simple if a teammate renamed a variable and our commit still uses its old name.
 Perhaps a teammate refactored a method, and our commit wants to change code that's now in a different place.
 
@@ -250,11 +252,11 @@ Unmerged paths:
 ```
 
 For a contrived example, let's say we have a `sayHello()` function.
-A teammate just merged a pull request to `master` that added a `name` parameter to say "Hello" to people by name.
+A teammate just merged a pull request to `main` that added a `name` parameter to say "Hello" to people by name.
 But in our feature branch, we updated it to say "Greetings" instead.
 
 ```js
-<<<<<< Changes from teammate's commit "Say hello by name" in master
+<<<<<< Changes from teammate's commit "Say hello by name" in main
 function sayHello(name) {
 	console.log(`Hello, ${name}!`);
 ======
@@ -285,7 +287,7 @@ Instead of adding new commits to the branch on GitHub, we want to _replace_ the 
 For this, we use `git push --force-with-lease`.
 Git will replace the commits, but it will also protect us from overwriting any new commits on the branch.
 
-<img src="rebase-master.png" width="1024" />
+<img src="rebase-main.png" width="1024" />
 
 If we've added commits from review suggestions on GitHub but forgot to pull them down before rebasing, Git will reject the push even with `--force-with-lease` because the push would overwrite the suggestion commits.
 We need to start over and pull the suggestion commits before performing the rebase.
@@ -297,8 +299,8 @@ $ git switch my-new-branch
 $ git reset --hard origin/my-new-branch
 # Pull any new commits from the pull request.
 $ git pull
-# Now re-do the rebase on master.
-$ git rebase master
+# Now re-do the rebase on main.
+$ git rebase main
 # After resolving merge conflicts and finishing the rebase, update the pull request.
 $ git push --force-with-lease
 ```
@@ -321,8 +323,8 @@ The feature pull request will be easier to review and less likely to encounter a
 # Found a bug while working on cool-feature!
 # Stash changes to come back to them later.
 $ git stash
-# Head back to master and check for newer changes.
-$ git switch master
+# Head back to main and check for newer changes.
+$ git switch main
 $ git pull
 # Start a new branch for the bug fix.
 $ git branch fix-bug
@@ -351,11 +353,11 @@ $ git switch feature-part-two
 # ...
 # Keep committing to feature-part-two.
 # ...
-# When feature-part-one is approved and merged to master, rebase part two on top of master.
-$ git switch master
+# When feature-part-one is approved and merged to main, rebase part two on top of main.
+$ git switch main
 $ git pull
 $ git switch feature-part-two
-$ git rebase master
+$ git rebase main
 ```
 
 Advanced tools like [`git cherry-pick`][Cherry-picking commits] can help pull bug fixes or refactors from larger branches into their own standalone pull requests.
@@ -448,21 +450,21 @@ $ git config --global pull.ff only
 
 Enable [branch protection](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/about-protected-branches) in your GitHub repository's settings:
 
-- `master`
+- `main`
     - Don't allow force pushes
-        - This only applies to `master`.
+        - This only applies to `main`.
         - We can still `--force-with-lease` to feature branches in advanced uses.
     - Don't allow deletions
     - Include administrators
-        - Prevents even organization owners from accidentally force pushing to `master`.
+        - Prevents even organization owners from accidentally force pushing to `main`.
         - If 💩 hits the fan and you really need to, you can temporarily un-check this.
     - Optionally, require pull request reviews before merging
         - Changes must go through code review.
-        - Prevents accidentally pushing directly to `master`.
+        - Prevents accidentally pushing directly to `main`.
     - Optionally, require status checks to pass before merging
         - If your automated tests aren't flaky.
     - Optionally, require linear history
-        - Forces people to resolve conflicts via rebasing their feature branch on `master` instead of merge commits.
+        - Forces people to resolve conflicts via rebasing their feature branch on `main` instead of merge commits.
 
 GitHub will automatically clean up branches after merging pull requests if you enable "[Automatically delete head branches](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-the-automatic-deletion-of-branches)".
 
