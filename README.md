@@ -4,6 +4,9 @@
 
 - [Git](#git)
   - [Contents](#contents)
+  - [Git etiquette](#git-etiquette)
+    - [One focus per pull request](#one-focus-per-pull-request)
+    - [Tell a linear story](#tell-a-linear-story)
   - [Core Concepts](#core-concepts)
     - [Commits](#commits)
     - [`HEAD`](#head)
@@ -17,9 +20,6 @@
       - [Suggested changes](#suggested-changes)
       - [Rejected push](#rejected-push)
     - [Merge conflicts](#merge-conflicts)
-  - [Git etiquette](#git-etiquette)
-    - [One focus per pull request](#one-focus-per-pull-request)
-    - [Tell a linear story](#tell-a-linear-story)
   - [Advanced usage](#advanced-usage)
     - [Reverting a pull request](#reverting-a-pull-request)
     - [Committing only part of a file](#committing-only-part-of-a-file)
@@ -34,6 +34,81 @@
 This guide assumes Git version 2.28.0.
 You can install it from [Homebrew](https://brew.sh/) with `brew install git`.
 The version of Git that comes with macOS is older, so if some of these commands don't work, check `git --version`.
+
+## Git etiquette
+
+Good Git usage reflects empathy for code reviewers.
+
+### One focus per pull request
+
+A pull request is easiest to review when it has one focus.
+A single-commit pull request with a three-line styling change and before and after screenshots in the description takes no time at all to review.
+Better yet, it won't be open long enough for another change to create a merge conflict.
+
+Implementing features will never be that simple, but keeping them focused will pay off in less painful code reviews.
+If we stumble across an existing bug while working on a feature, putting the fix in its own pull request will have it fixed in production before we're ever done implementing the feature.
+The feature pull request will be easier to review and less likely to encounter a merge conflict because it no longer includes an unrelated change.
+
+```sh
+# Found a bug while working on cool-feature!
+# Stash changes to come back to them later.
+$ git stash
+# Head back to main and check for newer changes.
+$ git switch main
+$ git pull
+# Start a new branch for the bug fix.
+$ git branch fix-bug
+$ git switch fix-bug
+# After fixing the bug, commit the change, push the branch, and open a pull request.
+$ git add fixed-file.js
+$ git commit
+$ git push --set-upstream origin fix-bug
+# Switch back to cool-feature and unstash changes to pick up where we left off.
+$ git switch cool-feature
+$ git stash pop
+```
+
+If a feature is particularly large, we can break it up into multiple pull requests.
+The first pull request could include the model, migration, and API endpoint.
+While that's in code review, we can keep working on a second pull request to use the new API from the client.
+This prevents individual code reviews from taking weeks of back-and-forth talking about different parts of the changes.
+
+```sh
+# We've finished part one of our feature. Create a pull request.
+$ git switch feature-part-one
+$ git push --set-upstream origin feature-part-one
+# Start a new branch starting from part one's branch label.
+$ git branch feature-part-two
+$ git switch feature-part-two
+# ...
+# Keep committing to feature-part-two.
+# ...
+# When feature-part-one is approved and merged to main, rebase part two on top of main.
+$ git switch main
+$ git pull
+$ git switch feature-part-two
+$ git rebase main
+```
+
+Advanced tools like [`git cherry-pick`][Cherry-picking commits] can help pull bug fixes or refactors from larger branches into their own standalone pull requests.
+
+### Tell a linear story
+
+The development process is messy and non-linear.
+We often iterate to a solution with false starts along the way, but reviewers care more about where we ended than the roundabout way we got there.
+
+The ideal pull request tells a linear story where each commit is a logical step.
+The reviewer doesn't need to know that we wrote a serializer, then we started building the client, then we realized we missed a serializer field, oh and then we found a typo in a variable name.
+Alternatively, finishing a feature and then leaving one "big bang" commit at the end leaves the reviewer to find their own way through how it works.
+When each commit is a logical step, we can guide the reviewer through the implementation.
+
+When we have un-committed changes in a file that we want to commit as multiple steps, we can [commit only part of a file][Committing only part of a file] to pick changes for each commit.
+
+If we want to go back and tweak a step that was already committed, we can [fix up a prior commit][Fixing prior commits] by combining more added and removed lines into the original commit.
+
+If we're done working but decide the story makes more sense with the steps in a different order, we can [re-order commits][Re-ordering commits].
+
+If we realize a commit does too many different things, we can [split it up][Splitting up commits] into individual commits.
 
 ## Core Concepts
 
@@ -304,81 +379,6 @@ $ git rebase main
 # After resolving merge conflicts and finishing the rebase, update the pull request.
 $ git push --force-with-lease
 ```
-
-## Git etiquette
-
-Good Git usage reflects empathy for code reviewers.
-
-### One focus per pull request
-
-A pull request is easiest to review when it has one focus.
-A single-commit pull request with a three-line styling change and before and after screenshots in the description takes no time at all to review.
-Better yet, it won't be open long enough for another change to create a merge conflict.
-
-Implementing features will never be that simple, but keeping them focused will pay off in less painful code reviews.
-If we stumble across an existing bug while working on a feature, putting the fix in its own pull request will have it fixed in production before we're ever done implementing the feature.
-The feature pull request will be easier to review and less likely to encounter a merge conflict because it no longer includes an unrelated change.
-
-```sh
-# Found a bug while working on cool-feature!
-# Stash changes to come back to them later.
-$ git stash
-# Head back to main and check for newer changes.
-$ git switch main
-$ git pull
-# Start a new branch for the bug fix.
-$ git branch fix-bug
-$ git switch fix-bug
-# After fixing the bug, commit the change, push the branch, and open a pull request.
-$ git add fixed-file.js
-$ git commit
-$ git push --set-upstream origin fix-bug
-# Switch back to cool-feature and unstash changes to pick up where we left off.
-$ git switch cool-feature
-$ git stash pop
-```
-
-If a feature is particularly large, we can break it up into multiple pull requests.
-The first pull request could include the model, migration, and API endpoint.
-While that's in code review, we can keep working on a second pull request to use the new API from the client.
-This prevents individual code reviews from taking weeks of back-and-forth talking about different parts of the changes.
-
-```sh
-# We've finished part one of our feature. Create a pull request.
-$ git switch feature-part-one
-$ git push --set-upstream origin feature-part-one
-# Start a new branch starting from part one's branch label.
-$ git branch feature-part-two
-$ git switch feature-part-two
-# ...
-# Keep committing to feature-part-two.
-# ...
-# When feature-part-one is approved and merged to main, rebase part two on top of main.
-$ git switch main
-$ git pull
-$ git switch feature-part-two
-$ git rebase main
-```
-
-Advanced tools like [`git cherry-pick`][Cherry-picking commits] can help pull bug fixes or refactors from larger branches into their own standalone pull requests.
-
-### Tell a linear story
-
-The development process is messy and non-linear.
-We often iterate to a solution with false starts along the way, but reviewers care more about where we ended than the roundabout way we got there.
-
-The ideal pull request tells a linear story where each commit is a logical step.
-The reviewer doesn't need to know that we wrote a serializer, then we started building the client, then we realized we missed a serializer field, oh and then we found a typo in a variable name.
-Alternatively, finishing a feature and then leaving one "big bang" commit at the end leaves the reviewer to find their own way through how it works.
-When each commit is a logical step, we can guide the reviewer through the implementation.
-
-When we have un-committed changes in a file that we want to commit as multiple steps, we can [commit only part of a file][Committing only part of a file] to pick changes for each commit.
-
-If we want to go back and tweak a step that was already committed, we can [fix up a prior commit][Fixing prior commits] by combining more added and removed lines into the original commit.
-
-If we're done working but decide the story makes more sense with the steps in a different order, we can [re-order commits][Re-ordering commits].
-
-If we realize a commit does too many different things, we can [split it up][Splitting up commits] into individual commits.
 
 ## Advanced usage
 
