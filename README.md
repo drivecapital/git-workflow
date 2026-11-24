@@ -7,6 +7,12 @@
   - [Git etiquette]
     - [One focus per pull request]
     - [Tell a linear story]
+    - [Commit messages and pull request descriptions]
+    - [Pull request review]
+      - [Minimize open pull requests]
+      - [Requesting review]
+      - [Review statuses]
+      - [Resolving comments]
   - [Core Concepts]
     - [Commits]
     - [`HEAD`]
@@ -38,77 +44,96 @@ The version of Git that comes with macOS is older, so if some of these commands 
 ## Git etiquette
 
 Good Git usage reflects empathy for code reviewers.
+It tightens feedback loops, shrinks time between building and shipping, and reduces in-progress work.
 
-### One focus per pull request
+### One focus per commit and pull request
 
-A pull request is easiest to review when it has one focus.
-A single-commit pull request with a three-line styling change and before and after screenshots in the description takes no time at all to review.
+Easily-reviewed commits and pull requests have one focus.
+If it's a three-line styling change and the description includes before and after screenshots, it takes no time at all to review.
 Better yet, it won't be open long enough for another change to create a merge conflict.
 
-Implementing features will never be that simple, but keeping them focused will pay off in less painful code reviews.
-If we stumble across an existing bug while working on a feature, putting the fix in its own pull request will have it fixed in production before we're ever done implementing the feature.
-The feature pull request will be easier to review and less likely to encounter a merge conflict because it no longer includes an unrelated change.
+Large features will never be that simple.
+Instead, break changes into [multiple pull requests][Stacked pull requests].
 
-```sh
-# Found a bug while working on cool-feature!
-# Stash changes to come back to them later.
-$ git stash
-# Head back to main and check for newer changes.
-$ git switch main
-$ git pull
-# Start a new branch for the bug fix.
-$ git branch fix-bug
-$ git switch fix-bug
-# After fixing the bug, commit the change, push the branch, and open a pull request.
-$ git add fixed-file.js
-$ git commit
-$ git push --set-upstream origin fix-bug
-# Switch back to cool-feature and unstash changes to pick up where we left off.
-$ git switch cool-feature
-$ git stash pop
-```
+> for each desired change, make the change easy (warning: this may be hard), then make the easy change
+>
+> [Kent Beck](https://xxcancel.com/KentBeck/status/250733358307500032?lang=en)
 
-If a feature is particularly large, we can break it up into multiple pull requests.
-The first pull request could include the model, migration, and API endpoint.
-While that's in code review, we can keep working on a second pull request to use the new API from the client.
-This prevents individual code reviews from taking weeks of back-and-forth talking about different parts of the changes.
-
-```sh
-# We've finished part one of our feature. Create a pull request.
-$ git switch feature-part-one
-$ git push --set-upstream origin feature-part-one
-# Start a new branch starting from part one's branch label.
-$ git branch feature-part-two
-$ git switch feature-part-two
-# ...
-# Keep committing to feature-part-two.
-# ...
-# When feature-part-one is approved and merged to main, rebase part two on top of main.
-$ git switch main
-$ git pull
-$ git switch feature-part-two
-$ git rebase main
-```
-
-Advanced tools like [`git cherry-pick`][Cherry-picking commits] can help pull bug fixes or refactors from larger branches into their own standalone pull requests.
+Fix an unrelated bug in its own pull request, then in a second pull request, refactor the code to extract a helper method.
+After the bug fix and refactor, later pull requests are purely additive with new models, API endpoints, or components.
 
 ### Tell a linear story
 
 The development process is messy and non-linear.
-We often iterate to a solution with false starts along the way, but reviewers care more about where we ended than the roundabout way we got there.
+We iterate to a solution with false starts along the way, but reviewers care about where we ended, not how we got there.
 
 The ideal pull request tells a linear story where each commit is a logical step.
-The reviewer doesn't need to know that we wrote a serializer, then we started building the client, then we realized we missed a serializer field, oh and then we found a typo in a variable name.
-Alternatively, finishing a feature and then leaving one "big bang" commit at the end leaves the reviewer to find their own way through how it works.
-When each commit is a logical step, we can guide the reviewer through the implementation.
+Too many commits and too few commits are both hard to review:
 
-When we have un-committed changes in a file that we want to commit as multiple steps, we can [commit only part of a file][Committing only part of a file] to pick changes for each commit.
+- The reviewer doesn't need to know that we wrote a serializer, then we started building the client, then we realized we missed a serializer field, oh and then we found a typo in a variable name.
+- Alternatively, finishing a feature and then leaving one "big bang" commit at the end leaves the reviewer to find their own way through how it works.
 
-If we want to go back and tweak a step that was already committed, we can [fix up a prior commit][Fixing prior commits] by combining more added and removed lines into the original commit.
+When each commit is a logical step, they guide the reviewer through the implementation like chapters in a story.
 
-If we're done working but decide the story makes more sense with the steps in a different order, we can [re-order commits][Re-ordering commits].
+- If un-committed changes belongs in multiple commits, [commit only part of a file][Committing only part of a file] to pick changes for each commit.
+- To go back and tweak a step that was already committed, [fix up a prior commit][Fixing prior commits].
+- If the story would make more sense in a different order, [re-order commits][Re-ordering commits].
+- If a commit does too many things, [split it up][Splitting up commits] into individual commits.
 
-If we realize a commit does too many different things, we can [split it up][Splitting up commits] into individual commits.
+### Commit messages and pull request descriptions
+
+Commit messages and pull request descriptions serve two purposes:
+
+Today, they talk reviewers through the change.
+Pull request descriptions introduce important context up front, and commit messages narrate each step.
+
+In the future, they tell us why a change was made the way it was.
+What tradeoffs did we make, and what context led to that decision as opposed to the alternatives?
+If we want to change this code, these records let us reproduce the original reasoning and change the decision [if context has changed](https://www.lesswrong.com/w/chesterton-s-fence).
+
+A good description answers all of the following questions, often in order:
+
+1. What are we trying to accomplish?
+  If there's already an issue, link to it with `Fixes #123` or `Refs #123`, and the reviewer can read the issue for context.
+2. How do we accomplish the goal? The reviewer should receive a high-level understanding of the plan before they've even looked at the code.
+3. What tradeoffs did we make, and what context led to those decisions as opposed to any alternatives?
+4. How should we review this change? Call out open questions and areas that warrant extra attention; conversely, flag areas like cut/paste reorganization that reviewers can skip past to save time.
+
+### Pull request review
+
+#### Minimize open pull requests
+
+Every in-progress change increases the team's [cognitive load](https://github.com/zakirullin/cognitive-load?tab=readme-ov-file#cognitive-load-is-what-matters).
+In general, wait to open a pull request until you need someone's else's feedback on a change.
+Once you open a pull request, prioritize responding to feedback and getting the change ready to ship.
+
+- If the entire change isn't ready to ship, open a draft pull request, and leave inline comments on specific areas where you need feedback.
+- If you pause work on a pull request, close it until you resume work and need feedback again.
+
+#### Requesting review
+
+As part of submitting a pull request:
+
+1. Ensure automated tests all pass.
+2. Consider LLM reviewers' feedback. Use human judgment on which suggestions to implement; even a technically-correct suggestion might not be the right tradeoff for our context.
+3. Not all changes require human review! After building trust with the team, if a change is within your expertise and you're confident in your decisions on any tradeoffs, label it `review:optional` and ship it.
+4. Particularly for larger changes, go through and leave inline comments where reviewers should answer a question, pay close attention to a hairy bit, or skip past entirely.
+5. Request a specific reviewer if you need their attention or the team if anyone can review.
+
+#### Review statuses
+
+Our team interprets GitHub's review statuses as follows:
+
+- Approved: Either the change looks good as-is, or, if we left feedback, we trust you to address it appropriately and merge without another round of review.
+- Changes requested: Something needs to be changed, and we'd like to see the update before merging.
+- Comment: There's an open discussion, and we're unsure whether it will stay as-is or lead to a change.
+
+#### Resolving comments
+
+We try to resolve pull request discussion threads before merging.
+If you address a comment with a code change, reply with a comment including the commit hash so the reviewer can go directly there. For example, "Fixed in a1b2c3."
+Unless the reviewer left an approval or otherwise indicated that no further review is needed, leave the thread unresolved, and request another review.
+The reviewer who started the discussion should resolve the thread once they're satisfied with the resolution.
 
 ## Core Concepts
 
@@ -439,6 +464,56 @@ _TODO_
 
 _TODO_
 
+### Stacked pull requests
+
+If we stumble across an existing bug while working on a feature, put the fix in its own pull request so it's live in production long before the feature is done.
+The feature's pull request will be easier to review without the unrelated change.
+
+```sh
+# Found a bug while working on cool-feature!
+# Stash changes to come back to them later.
+$ git stash
+# Head back to main and check for newer changes.
+$ git switch main
+$ git pull
+# Start a new branch for the bug fix.
+$ git branch fix-bug
+$ git switch fix-bug
+# After fixing the bug, commit the change, push the branch, and open a pull request.
+$ git add fixed-file.js
+$ git commit
+$ git push --set-upstream origin fix-bug
+# Switch back to cool-feature and unstash changes to pick up where we left off.
+$ git switch cool-feature
+$ git stash pop
+```
+
+If a feature is particularly large, break it up into multiple pull requests.
+The first pull request might extract a helper method that the feature will also use and can be merged early.
+The second pull request could include a new model, migration, and API endpoint.
+While that's in code review, we can keep working on a second pull request to use the new API from the client.
+This prevents individual code reviews from taking weeks of back-and-forth talking about different parts of the changes.
+
+```sh
+# We've finished part one of our feature. Create a pull request.
+$ git switch feature-part-one
+$ git push --set-upstream origin feature-part-one
+# Start a new branch starting from part one's branch label.
+$ git branch feature-part-two
+$ git switch feature-part-two
+# ...
+# Keep committing to feature-part-two.
+# ...
+# When feature-part-one is approved and merged to main, rebase part two on top of main.
+$ git switch main
+$ git pull
+$ git switch feature-part-two
+$ git rebase main
+```
+
+Advanced tools like [`git cherry-pick`][Cherry-picking commits] can help pull bug fixes or refactors from larger branches into their own standalone pull requests.
+GitHub's [stacked pull requests](https://docs.github.com/en/pull-requests/reference/stacked-pull-requests) and [the `gh stack` CLI](https://docs.github.com/en/pull-requests/reference/stacked-prs-cli-commands) automate some of the work of managing sequences of dependent pull requests.
+
 ## Configuration
 
 When pulling from GitHub, only allow "fast forwards".
@@ -472,6 +547,7 @@ GitHub will automatically clean up branches after merging pull requests if you e
 [Advanced usage]: #advanced-usage
 [Branches]: #branches
 [Cherry-picking commits]: #cherry-picking-commits
+[Commit messages and pull request descriptions]: #commit-messages-and-pull-request-descriptions
 [Commits]: #commits
 [Committing changes]: #committing-changes
 [Committing only part of a file]: #committing-only-part-of-a-file
@@ -483,14 +559,20 @@ GitHub will automatically clean up branches after merging pull requests if you e
 [Git]: #git
 [Interactive rebase]: #interactive-rebase
 [Merge conflicts]: #merge-conflicts
+[Minimize open pull requests]: #minimize-open-pull-requests
 [One focus per pull request]: #one-focus-per-pull-request
 [Opening a pull request]: #opening-a-pull-request
+[Pull request review]: #pull-request-review
 [Pushing and pulling]: #pushing-and-pulling
 [Re-ordering commits]: #re-ordering-commits
 [Rejected push]: #rejected-push
+[Requesting review]: #requesting-review
+[Resolving comments]: #resolving-comments
 [Reverting a pull request]: #reverting-a-pull-request
 [Review feedback]: #review-feedback
+[Review statuses]: #review-statuses
 [Splitting up commits]: #splitting-up-commits
+[Stacked pull requests]: #stacked-pull-requests
 [Starting a feature or bug fix]: #starting-a-feature-or-bug-fix
 [Suggested changes]: #suggested-changes
 [Tell a linear story]: #tell-a-linear-story
