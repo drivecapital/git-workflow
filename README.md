@@ -2,34 +2,34 @@
 
 ## Contents
 
-- [Git](#git)
-  - [Contents](#contents)
-  - [Git etiquette](#git-etiquette)
-    - [One focus per pull request](#one-focus-per-pull-request)
-    - [Tell a linear story](#tell-a-linear-story)
-  - [Core Concepts](#core-concepts)
-    - [Commits](#commits)
-    - [`HEAD`](#head)
-    - [Branches](#branches)
-    - [Pushing and pulling](#pushing-and-pulling)
-  - [Working on code](#working-on-code)
-    - [Starting a feature or bug fix](#starting-a-feature-or-bug-fix)
-    - [Committing changes](#committing-changes)
-    - [Opening a pull request](#opening-a-pull-request)
-      - [Review feedback](#review-feedback)
-      - [Suggested changes](#suggested-changes)
-      - [Rejected push](#rejected-push)
-    - [Merge conflicts](#merge-conflicts)
-  - [Advanced usage](#advanced-usage)
-    - [Reverting a pull request](#reverting-a-pull-request)
-    - [Committing only part of a file](#committing-only-part-of-a-file)
-    - [Un-staging changes](#un-staging-changes)
-    - [Cherry-picking commits](#cherry-picking-commits)
-    - [Interactive rebase](#interactive-rebase)
-      - [Re-ordering commits](#re-ordering-commits)
-      - [Fixing prior commits](#fixing-prior-commits)
-      - [Splitting up commits](#splitting-up-commits)
-  - [Configuration](#configuration)
+- [Git]
+  - [Contents]
+  - [Git etiquette]
+    - [One focus per pull request]
+    - [Tell a linear story]
+  - [Core Concepts]
+    - [Commits]
+    - [`HEAD`]
+    - [Branches]
+    - [Pushing and pulling]
+  - [Working on code]
+    - [Starting a feature or bug fix]
+    - [Committing changes]
+    - [Opening a pull request]
+      - [Review feedback]
+      - [Suggested changes]
+      - [Rejected push]
+    - [Merge conflicts]
+  - [Advanced usage]
+    - [Reverting a pull request]
+    - [Committing only part of a file]
+    - [Un-staging changes]
+    - [Cherry-picking commits]
+    - [Interactive rebase]
+      - [Re-ordering commits]
+      - [Fixing prior commits]
+      - [Splitting up commits]
+  - [Configuration]
 
 This guide assumes Git version 2.28.0.
 You can install it from [Homebrew](https://brew.sh/) with `brew install git`.
@@ -468,6 +468,7 @@ Enable [branch protection](https://docs.github.com/en/free-pro-team@latest/githu
 
 GitHub will automatically clean up branches after merging pull requests if you enable "[Automatically delete head branches](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-the-automatic-deletion-of-branches)".
 
+[`HEAD`]: #head
 [Advanced usage]: #advanced-usage
 [Branches]: #branches
 [Cherry-picking commits]: #cherry-picking-commits
@@ -475,10 +476,11 @@ GitHub will automatically clean up branches after merging pull requests if you e
 [Committing changes]: #committing-changes
 [Committing only part of a file]: #committing-only-part-of-a-file
 [Configuration]: #configuration
+[Contents]: #contents
 [Core Concepts]: #core-concepts
 [Fixing prior commits]: #fixing-prior-commits
 [Git etiquette]: #git-etiquette
-[`HEAD`]: #head
+[Git]: #git
 [Interactive rebase]: #interactive-rebase
 [Merge conflicts]: #merge-conflicts
 [One focus per pull request]: #one-focus-per-pull-request
